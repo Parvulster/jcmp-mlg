@@ -1,0 +1,61 @@
+-- Test Script --
+-- By Parvulster --
+test_objects = {}
+
+function PlayerChat(args)
+	if args.text == "/test" then
+		local player = args.player
+		spawnArgs = {}
+		spawnArgs.position = args.player:GetPosition()
+		spawnArgs.angle = args.player:GetAngle()
+		spawnArgs.model = "34x09.flz/go001-a.lod"
+		spawnArgs.collision = ""
+		print("Object Spawn Needed")
+		CreateObject(player)
+		return false
+	end
+	if args.text == "/table" then
+		for k, v in pairs(test_objects) do
+			print(k, v)
+		end
+	end
+	if args.text == "/id" then
+		print(args.player:GetId())
+	end
+	return true
+end
+
+function DestroyObject(player)
+	if test_objects[player:GetId()] ~= nil then
+		if IsValid(test_objects[player:GetId()], false ) then
+			test_objects[player:GetId()]:Remove()
+		end
+		test_objects[player:GetId()] = nil
+	end
+end
+
+function CreateObject(player)
+	DestroyObject(player)
+	test_objects[player:GetId()] = StaticObject.Create({
+	position = player:GetPosition(),
+	angle = player:GetAngle(),
+	model = "v072-tyres01-air01.lod",
+	collision = ""
+	})
+	print("Object Spawned")
+end
+
+function RenderTick()
+	for k, v in pairs(test_objects) do
+		MoveObject(k)
+	end
+end
+
+function MoveObject(player)
+	local object = test_objects[player]
+	object:SetPosition(player:GetPosition())
+	object:SetAngle(player:GetAngle())
+end
+ 
+Events:Subscribe("Render", RenderTick)
+Events:Subscribe("PlayerChat", PlayerChat)
